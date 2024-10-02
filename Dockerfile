@@ -1,94 +1,75 @@
-ARG UBUNTU_VERSION=16
+ARG DEBIAN_VERSION=11
 
-FROM ubuntu:16.04 AS base-16
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+FROM debian:${DEBIAN_VERSION} AS base
+RUN apt-get update && apt-get -y install \
     bzip2 \
     default-jre \
-    git \ 
+    git \
     perl-base \
-    php7.0-cli \ 
-    php7.0-xml \ 
-    php7.0-mysql \
-    python-matplotlib \ 
-    python-numpy \
-    python-pysam \
-    r-base-core \ 
-    r-cran-optparse \ 
-    r-cran-robustbase \ 
-    r-cran-foreach \ 
-    r-cran-doparallel \ 
+    php-cli \
+    php-xml \
+    php-mysql \
+    python3-matplotlib \
+    python3-numpy \
+    python3-pysam \
+    r-base \
+    r-cran-optparse \
+    r-cran-robustbase \
+    r-cran-foreach \
+    r-cran-doparallel \
     r-cran-mass \
     tabix \
     unzip \
-    wget
-
-FROM ubuntu:18.04 AS base-18
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    bzip2 \
-    default-jre \
-    git \ 
-    perl-base \ 
-    php7.2-cli \ 
-    php7.2-xml \ 
-    php7.2-mysql \ 
-    python-matplotlib \
-    python-numpy \
-    python-pysam \
-    r-base-core \ 
-    r-cran-optparse \ 
-    r-cran-robustbase \ 
-    r-cran-foreach \ 
-    r-cran-doparallel \ 
-    r-cran-mass \
-    tabix \ 
-    unzip \ 
-    wget
-
-FROM base-${UBUNTU_VERSION} AS tools-ubuntu-16
-RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    build-essential \ 
-    cmake \ 
+    wget \
+    build-essential \
+    cmake \
     cpanminus \
-    libbz2-dev \ 
-    liblzma-dev \ 
-    libncurses5-dev \ 
-    libpng-dev \ 
-    libmysqlclient-dev \
-    libqt5sql5-mysql \ 
-    libqt5xmlpatterns5-dev \ 
-    libssl-dev \ 
-    qt5-default \ 
-    qt5-qmake \ 
-    qtbase5-dev 
-
-FROM base-${UBUNTU_VERSION} AS tools-ubuntu-18
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
-    build-essential \ 
-    cmake \ 
-    cpanminus \
-    libbz2-dev \ 
-    liblzma-dev \ 
-    libmysqlclient-dev \
-    libncurses5-dev \ 
-    libqt5sql5-mysql \ 
+    libbz2-dev \
+    liblzma-dev \
+    libncurses5-dev \
     libpng-dev \
-    libqt5xmlpatterns5-dev \ 
+    libmariadb-dev \
+    libqt5sql5-mysql \
+    libqt5xmlpatterns5-dev \
     libssl-dev \
-    qt5-default \ 
-    qt5-qmake \ 
-    qtbase5-dev
+    qt5-qmake \
+    qtbase5-dev \
+    curl \
+    libffi-dev \
+    patch \
+    libhts-dev \
+    libtabixpp-dev \
+    libtabixpp0 \
+    xorg-dev \
+    libx11-dev \
+    libxext-dev \
+    libxrender-dev \
+    libxtst-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libgd-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libxml2-dev \
+    rsync
 
-FROM tools-ubuntu-${UBUNTU_VERSION} AS build
-ADD . /megSAP
+FROM base AS build
+WORKDIR /megSAP
+RUN git clone https://github.com/globaldatanet/megsap-debian /megSAP
+
 WORKDIR /megSAP/data
-RUN chmod 755 download_*.sh && ./download_tools.sh
+RUN chmod 755 *.sh
+RUN ./download_tools.sh
+RUN ./download_tools_somatic.sh
+RUN ./download_tools_rna.sh
+RUN ./download_GRCh38.sh
 
-FROM base-${UBUNTU_VERSION}
+FROM base AS final
 COPY --from=build /megSAP/ /megSAP/
 COPY --from=build /megSAP/data/dbs/ /megSAP/data/dbs_static/
-COPY --from=build /usr/local/share/perl/ /usr/local/share/perl/
-COPY --from=build /usr/local/lib/x86_64-linux-gnu/perl/ /usr/local/lib/x86_64-linux-gnu/perl/
-COPY --from=build /usr/local/bin/ /usr/local/bin/
+COPY --from=build /usr/share/perl/ /usr/share/perl/
+COPY --from=build /usr/lib/x86_64-linux-gnu/perl/ /usr/lib/x86_64-linux-gnu/perl/
+COPY --from=build /usr/bin/perl /usr/bin/perl
 
 WORKDIR /megSAP
 ENTRYPOINT ["/bin/bash"]

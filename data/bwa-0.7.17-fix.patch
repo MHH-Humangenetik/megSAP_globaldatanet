@@ -1,0 +1,10 @@
+--- a/rle.h
++++ b/rle.h
+@@ -1,4 +1,4 @@
+ #ifndef RLE_H
+ #define RLE_H
+ 
+-int rle_auxtab[256];
++extern int rle_auxtab[256];
+ 
+ #endif /* RLE_H */
