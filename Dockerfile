@@ -58,7 +58,7 @@ FROM base AS build
 WORKDIR /megSAP
 
 # Clone the full repository with all branches and tags, disabling any potential caching issues
-RUN git clone https://github.com/imgag/megSAP.git /megSAP --no-single-branch
+RUN git clone https://github.com/globaldatanet/megSAP.git /megSAP --no-single-branch
 
 WORKDIR /megSAP
 
@@ -67,6 +67,7 @@ RUN git fetch --all --tags --prune
 
 # Debugging: List all the tags to make sure they are available
 RUN git tag
+
 
 # Now run git describe --tags to see if it works correctly
 RUN git describe --tags
