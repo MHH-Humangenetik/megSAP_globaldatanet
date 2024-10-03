@@ -54,11 +54,22 @@ RUN apt-get update && apt-get -y install \
     rsync
 
 FROM base AS build
+# Set working directory
 WORKDIR /megSAP
-RUN git clone --no-single-branch --branch=main https://github.com/globaldatanet/megsap-debian /megSAP
+
+# Clone the full repository with all branches and tags, disabling any potential caching issues
+RUN git clone https://github.com/imgag/megSAP.git /megSAP --no-single-branch
+
 WORKDIR /megSAP
-RUN git fetch --all --tags --prune --unshallow
-RUN git describe --tags 2>&1
+
+# Ensure all tags and full history are fetched properly
+RUN git fetch --all --tags --prune
+
+# Debugging: List all the tags to make sure they are available
+RUN git tag
+
+# Now run git describe --tags to see if it works correctly
+RUN git describe --tags
 
 WORKDIR /megSAP/data
 RUN chmod 755 *.sh
