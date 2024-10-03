@@ -487,19 +487,41 @@ function repository_basedir()
 ///Returns the revision of the repository.
 function repository_revision($prefix_repos_name=false)
 {
-	$tag_file = repository_basedir()."/megSAP_tag.txt";
-	if (file_exists($tag_file))
-	{
-		$tag = trim(file_get_contents($tag_file));
-	}
-	else
-	{
-		$output = array();
-		exec("cd ".repository_basedir()." && git describe --tags", $output);
-		$tag = trim($output[0]);
-	}
-	
-	return ($prefix_repos_name ? "megSAP " : "").$tag;
+    $log_file = '/path/to/log/file.log'; // Specify the path to your log file
+    $tag_file = repository_basedir()."/megSAP_tag.txt";
+    
+    if (file_exists($tag_file))
+    {
+        $tag = trim(file_get_contents($tag_file));
+        // Log that the tag was read from the file
+        error_log("Tag read from file: $tag\n", 3, $log_file);
+    }
+    else
+    {
+        $output = array();
+        exec("cd ".repository_basedir()." && git describe --tags 2>&1", $output, $return_var);
+        
+        if ($return_var !== 0) {
+            // Log the failure and output from the git command
+            error_log("Git describe failed: " . implode("\n", $output) . "\n", 3, $log_file);
+            $tag = "no-tag-found";
+        } else {
+            if (isset($output[0])) {
+                $tag = trim($output[0]);
+                // Log the successful tag retrieval
+                error_log("Tag retrieved from git describe: $tag\n", 3, $log_file);
+            } else {
+                // Log if no tag was found
+                error_log("No tag found from git describe.\n", 3, $log_file);
+                $tag = "no-tag-found";
+            }
+        }
+    }
+    
+    // Log the final returned tag
+    error_log("Returning tag: " . ($prefix_repos_name ? "megSAP " : "") . $tag . "\n", 3, $log_file);
+    
+    return ($prefix_repos_name ? "megSAP " : "").$tag;
 }
 
 /*

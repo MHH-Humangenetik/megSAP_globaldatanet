@@ -56,6 +56,8 @@ RUN apt-get update && apt-get -y install \
 FROM base AS build
 WORKDIR /megSAP
 RUN git clone https://github.com/globaldatanet/megsap-debian /megSAP
+WORKDIR /megSAP
+RUN git fetch --tags
 
 WORKDIR /megSAP/data
 RUN chmod 755 *.sh
