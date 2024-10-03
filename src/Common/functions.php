@@ -491,32 +491,25 @@ function repository_revision($prefix_repos_name = false)
     
     if (file_exists($tag_file)) {
         $tag = trim(file_get_contents($tag_file));
-        // Output to the console
         echo "Tag read from file: $tag\n";
     } else {
         $output = array();
         exec("cd " . repository_basedir() . " && git describe --tags 2>&1", $output, $return_var);
         
         if ($return_var !== 0) {
-            // Output failure and git command output to the console
             echo "Git describe failed: " . implode("\n", $output) . "\n";
             $tag = "no-tag-found";
         } else {
             if (isset($output[0])) {
                 $tag = trim($output[0]);
-                // Output the successful tag retrieval to the console
                 echo "Tag retrieved from git describe: $tag\n";
             } else {
-                // Output if no tag was found
                 echo "No tag found from git describe.\n";
                 $tag = "no-tag-found";
             }
         }
     }
-    
-    // Output the final returned tag to the console
-    echo "Returning tag: " . ($prefix_repos_name ? "megSAP " : "") . $tag . "\n";
-    
+
     return ($prefix_repos_name ? "megSAP " : "") . $tag;
 }
 
