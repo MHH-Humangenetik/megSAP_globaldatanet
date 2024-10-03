@@ -485,44 +485,41 @@ function repository_basedir()
 }
 
 ///Returns the revision of the repository.
-function repository_revision($prefix_repos_name=false)
+function repository_revision($prefix_repos_name = false)
 {
-    $log_file = '/path/to/log/file.log'; // Specify the path to your log file
-    $tag_file = repository_basedir()."/megSAP_tag.txt";
+    $tag_file = repository_basedir() . "/megSAP_tag.txt";
     
-    if (file_exists($tag_file))
-    {
+    if (file_exists($tag_file)) {
         $tag = trim(file_get_contents($tag_file));
-        // Log that the tag was read from the file
-        error_log("Tag read from file: $tag\n", 3, $log_file);
-    }
-    else
-    {
+        // Output to the console
+        echo "Tag read from file: $tag\n";
+    } else {
         $output = array();
-        exec("cd ".repository_basedir()." && git describe --tags 2>&1", $output, $return_var);
+        exec("cd " . repository_basedir() . " && git describe --tags 2>&1", $output, $return_var);
         
         if ($return_var !== 0) {
-            // Log the failure and output from the git command
-            error_log("Git describe failed: " . implode("\n", $output) . "\n", 3, $log_file);
+            // Output failure and git command output to the console
+            echo "Git describe failed: " . implode("\n", $output) . "\n";
             $tag = "no-tag-found";
         } else {
             if (isset($output[0])) {
                 $tag = trim($output[0]);
-                // Log the successful tag retrieval
-                error_log("Tag retrieved from git describe: $tag\n", 3, $log_file);
+                // Output the successful tag retrieval to the console
+                echo "Tag retrieved from git describe: $tag\n";
             } else {
-                // Log if no tag was found
-                error_log("No tag found from git describe.\n", 3, $log_file);
+                // Output if no tag was found
+                echo "No tag found from git describe.\n";
                 $tag = "no-tag-found";
             }
         }
     }
     
-    // Log the final returned tag
-    error_log("Returning tag: " . ($prefix_repos_name ? "megSAP " : "") . $tag . "\n", 3, $log_file);
+    // Output the final returned tag to the console
+    echo "Returning tag: " . ($prefix_repos_name ? "megSAP " : "") . $tag . "\n";
     
-    return ($prefix_repos_name ? "megSAP " : "").$tag;
+    return ($prefix_repos_name ? "megSAP " : "") . $tag;
 }
+
 
 /*
 	@brief Prints a data structure in human-readable HTML format.
