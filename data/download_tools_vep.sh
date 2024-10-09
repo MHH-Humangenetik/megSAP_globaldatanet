@@ -24,7 +24,13 @@ rm 110.1.tar.gz
 
 #install dependencies
 mkdir -p $cpan_dir
-cpanm -l $cpan_dir -L $cpan_dir Set::IntervalTree URI::Escape DB_File Carp::Assert JSON::XS PerlIO::gzip DBI
+cpanm -v -l $cpan_dir -L $cpan_dir Set::IntervalTree
+cpanm -v -l $cpan_dir -L $cpan_dir URI::Escape
+cpanm -v -l $cpan_dir -L $cpan_dir DB_File
+cpanm -v -l $cpan_dir -L $cpan_dir Carp::Assert
+cpanm -v -l $cpan_dir -L $cpan_dir JSON::XS
+cpanm -v -l $cpan_dir -L $cpan_dir PerlIO::gzip
+cpanm -v -l $cpan_dir -L $cpan_dir DBI
 
 #download VEP cache data
 mkdir -p $vep_data_dir
@@ -34,6 +40,6 @@ cd ftp
 wget https://ftp.ensembl.org/pub/release-110/variation/indexed_vep_cache/homo_sapiens_vep_110_GRCh38.tar.gz
 
 #install ensembl-vep
-PERL5LIB=$vep_install_dir/Bio/:$cpan_dir/lib/perl5/:$PERL5LIB
+export PERL5LIB=$vep_install_dir/Bio/:$cpan_dir/lib/perl5/:$PERL5LIB
 cd $vep_install_dir
 perl INSTALL.pl --SPECIES homo_sapiens --ASSEMBLY GRCh38 --AUTO ac --NO_UPDATE --NO_BIOPERL --CACHEDIR $vep_data_dir/cache --CACHEURL $vep_data_dir/ftp --NO_TEST --NO_HTSLIB

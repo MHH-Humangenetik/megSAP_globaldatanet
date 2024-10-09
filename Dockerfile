@@ -51,7 +51,10 @@ RUN apt-get update && apt-get -y install \
     libharfbuzz-dev \
     libfribidi-dev \
     libxml2-dev \
-    rsync
+    rsync \
+    libdb-dev \
+    aws-cli \
+    tmux
 
 FROM base AS build
 # Set working directory
@@ -77,7 +80,7 @@ RUN chmod 755 *.sh
 RUN ./download_tools.sh
 RUN ./download_tools_somatic.sh
 RUN ./download_tools_rna.sh
-RUN ./download_GRCh38.sh
+RUN ./download_tools_vep.sh
 
 FROM base AS final
 COPY --from=build /megSAP/ /megSAP/
