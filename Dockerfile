@@ -53,8 +53,9 @@ RUN apt-get update && apt-get -y install \
     libxml2-dev \
     rsync \
     libdb-dev \
-    aws-cli \
-    tmux
+    tmux \
+    python3-pip && \
+    pip3 install awscli --upgrade
 
 FROM base AS build
 # Set working directory
@@ -80,7 +81,7 @@ RUN chmod 755 *.sh
 RUN ./download_tools.sh
 RUN ./download_tools_somatic.sh
 RUN ./download_tools_rna.sh
-RUN ./download_tools_vep.sh
+# RUN ./download_tools_vep.sh
 
 FROM base AS final
 COPY --from=build /megSAP/ /megSAP/
