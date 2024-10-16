@@ -59,8 +59,8 @@ cd ClinVar
 wget -O - http://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive_2.0/2024/clinvar_20240127.vcf.gz | gunzip | php $src/Tools/db_converter_clinvar.php | $ngsbits/VcfStreamSort | bgzip > clinvar_20240127_converted_GRCh38.vcf.gz
 tabix -C -m 9 -p vcf clinvar_20240127_converted_GRCh38.vcf.gz
 #CNVs
-wget -O - http://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/archive/variant_summary_2023-11.txt.gz | gunzip > variant_summary_2023-11.txt
-cat variant_summary_2023-11.txt | php $src/Tools/db_converter_clinvar_cnvs.php 5 "Pathogenic/Likely pathogenic" | sort | uniq > clinvar_cnvs_2024-02.bed
+wget -O - http://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/archive/variant_summary_2024-10.txt.gz | gunzip > variant_summary_2024-10.txt
+cat variant_summary_2024-10.txt | php $src/Tools/db_converter_clinvar_cnvs.php 5 "Pathogenic/Likely pathogenic" | sort | uniq > clinvar_cnvs_2024-02.bed
 $ngsbits/BedSort -with_name -in clinvar_cnvs_2024-02.bed -out clinvar_cnvs_2024-02.bed
 
 #Install HGNC - http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/
@@ -182,89 +182,89 @@ wget https://github.com/PacificBiosciences/pbsv/raw/master/annotations/human_GRC
 #cd COSMIC
 ##Login and download the "Cancer Mutation Census Data": CMC.tar file from https://cancer.sanger.ac.uk/cmc/download. Extract the file and move the cmc_export.tsv.gz to data/dbs/COSMIC. There is no download API for CMC file.
 #gunzip -c CancerMutationCensus_AllData_v98_GRCh38.tsv.gz | php db_converter_cosmic.php -in_cmc cmc_export.tsv -in_genome_vcf Cosmic_GenomeScreensMutant_v98_GRCh38.vcf.gz -in_non_coding_vcf Cosmic_NonCodingVariants_v98_GRCh38.vcf.gz -in_target_screens_vcf Cosmic_CompleteTargetedScreensMutant_v98_GRCh38.vcf.gz -out cmc_export_v98.vcf.gz
-#install NGSD
-#
-#The usage of the NGSD annotation is optional. 
-#To generate the required VCF, BEDPE and BED files follow the instructions at https://github.com/imgag/ngs-bits/blob/master/doc/install_ngsd.md#export-ngsd-annotation-data (Export NGSD annotation data)
-#The generated files have to be linked to "$data_folder/dbs/NGSD/" as symbolic links and have to be named as follows:
-#	- "NGSD_germline.vcf.gz" for the germline export 
-#	- "NGSD_somatic.vcf.gz" for the somatic export 
-#	- "NGSD_genes.bed" for the gene info
-#	- "sv_deletion.bedpe.gz" for deletions
-#	- "sv_duplication.bedpe.gz" for duplications
-#	- "sv_insertion.bedpe.gz" for insertions
-#	- "sv_inversion.bedpe.gz" for inversions
-#	- "sv_translocation.bedpe.gz" for translocation
-#	- "sv_breakpoint_density.igv" for breakpoints
-#It is required the these files are symbolic links to avoid wrong annotations while performing a new export (megSAP will check if these files are symlinks and fail if not)
-#The actual files should be updated on regular bases (e.g. by using a cron job).
-#Example code (generates a date based subfolder and links the generated files to the main folder):
-#cd $dbs
-#curdate=`date +"%Y-%m-%d"`
-#mkdir $curdate
-#cd $curdate
-#$ngsbits/NGSDExportAnnotationData -germline NGSD_germline_unsorted.vcf -somatic NGSD_somatic_unsorted.vcf -genes NGSD_genes.bed
-#$ngsbits/VcfStreamSort -in NGSD_germline_unsorted.vcf -out NGSD_germline.vcf
-#bgzip -c NGSD_germline.vcf > NGSD_germline.vcf.gz
-#tabix -p vcf NGSD_germline.vcf.gz
-#rm NGSD_germline_unsorted.vcf
-#rm NGSD_germline.vcf
-#$ngsbits/VcfStreamSort -in NGSD_somatic_unsorted.vcf -out NGSD_somatic.vcf
-#bgzip -c NGSD_somatic.vcf > NGSD_somatic.vcf.gz
-#tabix -p vcf NGSD_somatic.vcf.gz
-#rm NGSD_somatic_unsorted.vcf
-#rm NGSD_somatic.vcf
-#cd ..
-#
-#rm -f NGSD_germline.vcf.gz.tbi
-#rm -f NGSD_somatic.vcf.gz.tbi
-#rm -f NGSD_germline.vcf.gz
-#rm -f NGSD_genes.bed
-#rm -f NGSD_somatic.vcf.gz
-#ln -s $curdate/NGSD_genes.bed NGSD_genes.bed
-#ln -s $curdate/NGSD_germline.vcf.gz NGSD_germline.vcf.gz
-#ln -s $curdate/NGSD_somatic.vcf.gz NGSD_somatic.vcf.gz
-#ln -s $curdate/NGSD_germline.vcf.gz.tbi NGSD_germline.vcf.gz.tbi
-#ln -s $curdate/NGSD_somatic.vcf.gz.tbi NGSD_somatic.vcf.gz.tbi
-#
-#bgzip -c $curdate/sv_deletion.bedpe > $curdate/sv_deletion.bedpe.gz
-#bgzip -c $curdate/sv_duplication.bedpe > $curdate/sv_duplication.bedpe.gz
-#bgzip -c $curdate/sv_insertion.bedpe > $curdate/sv_insertion.bedpe.gz
-#bgzip -c $curdate/sv_inversion.bedpe > $curdate/sv_inversion.bedpe.gz
-#$ngsbits/BedpeSort -in $curdate/sv_translocation.bedpe -out $curdate/sv_translocation.bedpe
-#bgzip -c $curdate/sv_translocation.bedpe > $curdate/sv_translocation.bedpe.gz
-#
-#tabix -0 -b 2 -e 5 $curdate/sv_deletion.bedpe.gz
-#tabix -0 -b 2 -e 5 $curdate/sv_duplication.bedpe.gz
-#tabix -0 -b 2 -e 3 $curdate/sv_insertion.bedpe.gz
-#tabix -0 -b 2 -e 5 $curdate/sv_inversion.bedpe.gz
-#tabix -0 -b 2 -e 3 $curdate/sv_translocation.bedpe.gz
-#
-#rm $curdate/sv_*.bedpe
-#
-#rm -f sv_deletion.bedpe.gz
-#rm -f sv_duplication.bedpe.gz
-#rm -f sv_insertion.bedpe.gz
-#rm -f sv_inversion.bedpe.gz
-#rm -f sv_translocation.bedpe.gz
-#rm -f sv_breakpoint_density.igv
-#
-#rm -f sv_deletion.bedpe.gz.tbi
-#rm -f sv_duplication.bedpe.gz.tbi
-#rm -f sv_insertion.bedpe.gz.tbi
-#rm -f sv_inversion.bedpe.gz.tbi
-#rm -f sv_translocation.bedpe.gz.tbi
-#
-#ln -s $curdate/sv_deletion.bedpe.gz sv_deletion.bedpe.gz
-#ln -s $curdate/sv_duplication.bedpe.gz sv_duplication.bedpe.gz
-#ln -s $curdate/sv_insertion.bedpe.gz sv_insertion.bedpe.gz
-#ln -s $curdate/sv_inversion.bedpe.gz sv_inversion.bedpe.gz
-#ln -s $curdate/sv_translocation.bedpe.gz sv_translocation.bedpe.gz
-#
-#ln -s $curdate/sv_deletion.bedpe.gz.tbi sv_deletion.bedpe.gz.tbi
-#ln -s $curdate/sv_duplication.bedpe.gz.tbi sv_duplication.bedpe.gz.tbi
-#ln -s $curdate/sv_insertion.bedpe.gz.tbi sv_insertion.bedpe.gz.tbi
-#ln -s $curdate/sv_inversion.bedpe.gz.tbi sv_inversion.bedpe.gz.tbi
-#ln -s $curdate/sv_translocation.bedpe.gz.tbi sv_translocation.bedpe.gz.tbi
-#
-#ln -s $curdate/sv_breakpoint_density.igv sv_breakpoint_density.igv
+# install NGSD
+
+# The usage of the NGSD annotation is optional. 
+# To generate the required VCF, BEDPE and BED files follow the instructions at https://github.com/imgag/ngs-bits/blob/master/doc/install_ngsd.md#export-ngsd-annotation-data (Export NGSD annotation data)
+# The generated files have to be linked to "$data_folder/dbs/NGSD/" as symbolic links and have to be named as follows:
+# 	- "NGSD_germline.vcf.gz" for the germline export 
+# 	- "NGSD_somatic.vcf.gz" for the somatic export 
+# 	- "NGSD_genes.bed" for the gene info
+# 	- "sv_deletion.bedpe.gz" for deletions
+# 	- "sv_duplication.bedpe.gz" for duplications
+# 	- "sv_insertion.bedpe.gz" for insertions
+# 	- "sv_inversion.bedpe.gz" for inversions
+# 	- "sv_translocation.bedpe.gz" for translocation
+# 	- "sv_breakpoint_density.igv" for breakpoints
+# It is required the these files are symbolic links to avoid wrong annotations while performing a new export (megSAP will check if these files are symlinks and fail if not)
+# The actual files should be updated on regular bases (e.g. by using a cron job).
+# Example code (generates a date based subfolder and links the generated files to the main folder):
+cd $dbs
+curdate=`date +"%Y-%m-%d"`
+mkdir $curdate
+cd $curdate
+$ngsbits/NGSDExportAnnotationData -germline NGSD_germline_unsorted.vcf -somatic NGSD_somatic_unsorted.vcf -genes NGSD_genes.bed
+$ngsbits/VcfStreamSort -in NGSD_germline_unsorted.vcf -out NGSD_germline.vcf
+bgzip -c NGSD_germline.vcf > NGSD_germline.vcf.gz
+tabix -p vcf NGSD_germline.vcf.gz
+rm NGSD_germline_unsorted.vcf
+rm NGSD_germline.vcf
+$ngsbits/VcfStreamSort -in NGSD_somatic_unsorted.vcf -out NGSD_somatic.vcf
+bgzip -c NGSD_somatic.vcf > NGSD_somatic.vcf.gz
+tabix -p vcf NGSD_somatic.vcf.gz
+rm NGSD_somatic_unsorted.vcf
+rm NGSD_somatic.vcf
+cd ..
+
+rm -f NGSD_germline.vcf.gz.tbi
+rm -f NGSD_somatic.vcf.gz.tbi
+rm -f NGSD_germline.vcf.gz
+rm -f NGSD_genes.bed
+rm -f NGSD_somatic.vcf.gz
+ln -s $curdate/NGSD_genes.bed NGSD_genes.bed
+ln -s $curdate/NGSD_germline.vcf.gz NGSD_germline.vcf.gz
+ln -s $curdate/NGSD_somatic.vcf.gz NGSD_somatic.vcf.gz
+ln -s $curdate/NGSD_germline.vcf.gz.tbi NGSD_germline.vcf.gz.tbi
+ln -s $curdate/NGSD_somatic.vcf.gz.tbi NGSD_somatic.vcf.gz.tbi
+
+bgzip -c $curdate/sv_deletion.bedpe > $curdate/sv_deletion.bedpe.gz
+bgzip -c $curdate/sv_duplication.bedpe > $curdate/sv_duplication.bedpe.gz
+bgzip -c $curdate/sv_insertion.bedpe > $curdate/sv_insertion.bedpe.gz
+bgzip -c $curdate/sv_inversion.bedpe > $curdate/sv_inversion.bedpe.gz
+$ngsbits/BedpeSort -in $curdate/sv_translocation.bedpe -out $curdate/sv_translocation.bedpe
+bgzip -c $curdate/sv_translocation.bedpe > $curdate/sv_translocation.bedpe.gz
+
+tabix -0 -b 2 -e 5 $curdate/sv_deletion.bedpe.gz
+tabix -0 -b 2 -e 5 $curdate/sv_duplication.bedpe.gz
+tabix -0 -b 2 -e 3 $curdate/sv_insertion.bedpe.gz
+tabix -0 -b 2 -e 5 $curdate/sv_inversion.bedpe.gz
+tabix -0 -b 2 -e 3 $curdate/sv_translocation.bedpe.gz
+
+rm $curdate/sv_*.bedpe
+
+rm -f sv_deletion.bedpe.gz
+rm -f sv_duplication.bedpe.gz
+rm -f sv_insertion.bedpe.gz
+rm -f sv_inversion.bedpe.gz
+rm -f sv_translocation.bedpe.gz
+rm -f sv_breakpoint_density.igv
+
+rm -f sv_deletion.bedpe.gz.tbi
+rm -f sv_duplication.bedpe.gz.tbi
+rm -f sv_insertion.bedpe.gz.tbi
+rm -f sv_inversion.bedpe.gz.tbi
+rm -f sv_translocation.bedpe.gz.tbi
+
+ln -s $curdate/sv_deletion.bedpe.gz sv_deletion.bedpe.gz
+ln -s $curdate/sv_duplication.bedpe.gz sv_duplication.bedpe.gz
+ln -s $curdate/sv_insertion.bedpe.gz sv_insertion.bedpe.gz
+ln -s $curdate/sv_inversion.bedpe.gz sv_inversion.bedpe.gz
+ln -s $curdate/sv_translocation.bedpe.gz sv_translocation.bedpe.gz
+
+ln -s $curdate/sv_deletion.bedpe.gz.tbi sv_deletion.bedpe.gz.tbi
+ln -s $curdate/sv_duplication.bedpe.gz.tbi sv_duplication.bedpe.gz.tbi
+ln -s $curdate/sv_insertion.bedpe.gz.tbi sv_insertion.bedpe.gz.tbi
+ln -s $curdate/sv_inversion.bedpe.gz.tbi sv_inversion.bedpe.gz.tbi
+ln -s $curdate/sv_translocation.bedpe.gz.tbi sv_translocation.bedpe.gz.tbi
+
+ln -s $curdate/sv_breakpoint_density.igv sv_breakpoint_density.igv
