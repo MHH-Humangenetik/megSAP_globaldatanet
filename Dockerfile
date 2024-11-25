@@ -55,8 +55,11 @@ RUN apt-get update && apt-get -y install \
     libdb-dev \
     tmux \
     python3-pip && \
-    gnumeric && \
-    pip3 install awscli --upgrade \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:gnumeric/ppa -y && \
+    apt-get update && \
+    apt-get -y install gnumeric && \
+    pip3 install awscli --upgrade && \
     pip3 install tensorflow keras
 
 FROM base AS build
