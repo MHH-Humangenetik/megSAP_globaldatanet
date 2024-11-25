@@ -11,16 +11,16 @@ dbs=$root/dbs/
 #folder=/mnt/storage2/megSAP/tools/
 #dbs=/mnt/storage2/megSAP/data/dbs
 
-vep_install_dir=$folder/ensembl-vep-release-110.1/
-vep_data_dir=$dbs/ensembl-vep-110/
+vep_install_dir=$folder/ensembl-vep-release-112/
+vep_data_dir=$dbs/ensembl-vep-112/
 cpan_dir=$folder/perl_cpan/
 
 # download ensembl-vep
 cd $folder
-wget https://github.com/Ensembl/ensembl-vep/archive/release/110.1.tar.gz
+wget https://github.com/Ensembl/ensembl-vep/archive/release/112.tar.gz
 mkdir $vep_install_dir
-tar -C $vep_install_dir --strip-components=1 -xzf 110.1.tar.gz
-rm 110.1.tar.gz
+tar -C $vep_install_dir --strip-components=1 -xzf 112.tar.gz
+rm 112.tar.gz
 
 #install dependencies
 mkdir -p $cpan_dir
@@ -31,8 +31,11 @@ cpanm -v -l $cpan_dir -L $cpan_dir Carp::Assert
 cpanm -v -l $cpan_dir -L $cpan_dir JSON::XS
 cpanm -v -l $cpan_dir -L $cpan_dir PerlIO::gzip
 cpanm -v -l $cpan_dir -L $cpan_dir DBI
+cpanm -v -l $cpan_dir -L $cpan_dir Bio::Perl
+cpanm -v -l $cpan_dir -L $cpan_dir Bio::PrimarySeqI
 
-#download VEP cache data
+
+#download VEP cache data (DOWNLOAD FROM S3)
 mkdir -p $vep_data_dir
 cd $vep_data_dir
 mkdir -p ftp

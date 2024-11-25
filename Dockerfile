@@ -10,7 +10,7 @@ RUN apt-get update && apt-get -y install \
     php-xml \
     php-mysql \
     python3-matplotlib \
-    python3-numpy \
+    python3-numpy \ 
     python3-pysam \
     r-base \
     r-cran-optparse \
@@ -55,7 +55,9 @@ RUN apt-get update && apt-get -y install \
     libdb-dev \
     tmux \
     python3-pip && \
-    pip3 install awscli --upgrade
+    gnumeric && \
+    pip3 install awscli --upgrade \
+    pip3 install tensorflow keras
 
 FROM base AS build
 # Set working directory
@@ -81,7 +83,7 @@ RUN chmod 755 *.sh
 RUN ./download_tools.sh
 RUN ./download_tools_somatic.sh
 RUN ./download_tools_rna.sh
-# RUN ./download_tools_vep.sh
+RUN ./download_tools_vep.sh
 
 FROM base AS final
 COPY --from=build /megSAP/ /megSAP/

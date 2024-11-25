@@ -17,7 +17,7 @@ samblaster = [path]/data/tools/samblaster-0.1.26/samblaster
 bwa = [path]/data/tools/bwa-0.7.17/bwa
 bwa-mem2 = [path]/data/tools/bwa-mem2-2.2.1_x64-linux/bwa-mem2
 vep = [path]/data/tools//ensembl-vep-release-110.1/vep
-vep_data = [path]/data/dbs/ensembl-vep-110/
+vep_data = [path]/data/dbs/ensembl-vep-112/
 perl_cpan = [path]/data/tools/perl_cpan/
 interop = [path]/data/tools/interop-1.2.4-Linux-GNU/bin/summary
 rscript = [path]/R-4.1.0/bin/Rscript
@@ -103,10 +103,10 @@ queues_dragen =
 use_dragen_sv_calling = false
 
 [mysql-databases]
-db_host['NGSD'] = "localhost"
-db_name['NGSD'] = "ngsd"
-db_user['NGSD'] = "ngsduser"
-db_pass['NGSD'] = ""
+db_host['NGSD'] = "sql.img.med.uni-tuebingen.de"
+db_name['NGSD'] = "NGSD_nightly"
+db_user['NGSD'] = "ngsd_nightly"
+db_pass['NGSD'] = "wacRY5MfpXPQQx9M"
 
 [grid_engine]
 queue_email = ""
