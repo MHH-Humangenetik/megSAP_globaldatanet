@@ -53,32 +53,19 @@ RUN apt-get update && apt-get -y install \
     libxml2-dev \
     rsync \
     libdb-dev \
+    gnumeric \
     tmux \
-    python3-pip && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository ppa:gnumeric/ppa -y && \
-    apt-get update && \
-    apt-get -y install gnumeric && \
-    pip3 install awscli --upgrade && \
-    pip3 install tensorflow keras
+    python3-pip
 
 FROM base AS build
-# Set working directory
 WORKDIR /megSAP
 
-# Clone the full repository with all branches and tags, disabling any potential caching issues
 RUN git clone https://github.com/globaldatanet/megSAP.git /megSAP --no-single-branch
 
 WORKDIR /megSAP
 
-# Ensure all tags and full history are fetched properly
 RUN git fetch --all --tags --prune
-
-# Debugging: List all the tags to make sure they are available
 RUN git tag
-
-
-# Now run git describe --tags to see if it works correctly
 RUN git describe --tags
 
 WORKDIR /megSAP/data
@@ -87,6 +74,9 @@ RUN ./download_tools.sh
 RUN ./download_tools_somatic.sh
 RUN ./download_tools_rna.sh
 RUN ./download_tools_vep.sh
+
+RUN pip3 install awscli --upgrade && \
+    pip3 install tensorflow keras
 
 FROM base AS final
 COPY --from=build /megSAP/ /megSAP/
